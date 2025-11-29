@@ -214,44 +214,6 @@
             overflow: visible;
         }
 
-        .format-checkbox .tooltip {
-            visibility: hidden;
-            opacity: 0;
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%) translateY(-8px);
-            background: var(--color-black);
-            color: var(--color-white);
-            padding: 12px 16px;
-            border-radius: var(--border-radius-sm);
-            font-size: 0.85em;
-            font-weight: 400;
-            white-space: nowrap;
-            z-index: 1000;
-            transition: opacity 0.3s, transform 0.3s;
-            pointer-events: none;
-            max-width: 250px;
-            white-space: normal;
-            text-align: center;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .format-checkbox .tooltip::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 6px solid transparent;
-            border-top-color: var(--color-black);
-        }
-
-        .format-checkbox:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-            transform: translateX(-50%) translateY(-12px);
-        }
 
         .format-checkbox::before {
             content: '';
@@ -690,14 +652,12 @@
                 formatsGroup.innerHTML = data.available_formats.map(format => {
                     const icon = formatIcons[format] || '📝';
                     const name = formatNames[format] || format.charAt(0).toUpperCase() + format.slice(1).replace(/_/g, ' ');
-                    const description = data.descriptions[format] || 'Формат контента';
                     const isChecked = data.builtin_formats.includes(format) || ['telegram', 'email', 'blog', 'press_release'].includes(format);
                     
                     return `
                         <div class="format-checkbox">
                             <input type="checkbox" id="${format}" name="formats" value="${format}" ${isChecked ? 'checked' : ''}>
                             <label for="${format}">${icon} ${name}</label>
-                            <span class="tooltip">${escapeHtml(description)}</span>
                         </div>
                     `;
                 }).join('');
