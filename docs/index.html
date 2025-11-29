@@ -640,15 +640,17 @@
         // Проверка доступности сервера
         async function checkServer() {
             try {
-                const response = await fetch('/formats', { 
-                    method: 'GET',
-                    mode: 'no-cors'
-                });
-                serverNotice.style.display = 'none';
+                const response = await fetch('http://localhost:8000/formats');
+                if (response.ok) {
+                    serverNotice.style.display = 'none';
+                    document.getElementById('generateForm').style.display = 'block';
+                    return true;
+                }
             } catch (error) {
                 // Сервер недоступен - показываем уведомление
                 console.log('Сервер недоступен, показываем инструкции');
             }
+            return false;
         }
 
         function escapeHtml(text) {
@@ -659,8 +661,13 @@
 
         // Загрузка форматов при старте
         async function loadFormats() {
+            const serverAvailable = await checkServer();
+            if (!serverAvailable) {
+                return;
+            }
+
             try {
-                const response = await fetch('/formats');
+                const response = await fetch('http://localhost:8000/formats');
                 const data = await response.json();
                 const formatsGroup = document.getElementById('formatsGroup');
                 
@@ -737,7 +744,7 @@
             submitBtn.disabled = true;
 
             try {
-                const response = await fetch('/generate', {
+                const response = await fetch('http://localhost:8000/generate', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
