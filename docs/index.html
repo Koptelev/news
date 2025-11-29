@@ -714,8 +714,9 @@
                     `;
                 }).join('');
 
-                // Если форматы загрузились, скрываем уведомление
+                // Если форматы загрузились, скрываем уведомление и показываем форму
                 serverNotice.style.display = 'none';
+                document.getElementById('generateForm').style.display = 'block';
             } catch (error) {
                 console.error('Ошибка загрузки форматов:', error);
                 document.getElementById('formatsGroup').innerHTML = 
