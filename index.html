@@ -640,7 +640,11 @@
         // Проверка доступности сервера
         async function checkServer() {
             try {
-                const response = await fetch('http://localhost:8000/formats');
+                // Пробуем подключиться к локальному серверу
+                const response = await fetch('http://localhost:8000/formats', {
+                    mode: 'cors',
+                    method: 'GET'
+                });
                 if (response.ok) {
                     serverNotice.style.display = 'none';
                     document.getElementById('generateForm').style.display = 'block';
@@ -649,6 +653,8 @@
             } catch (error) {
                 // Сервер недоступен - показываем уведомление
                 console.log('Сервер недоступен, показываем инструкции');
+                serverNotice.style.display = 'block';
+                document.getElementById('generateForm').style.display = 'none';
             }
             return false;
         }
@@ -663,6 +669,8 @@
         async function loadFormats() {
             const serverAvailable = await checkServer();
             if (!serverAvailable) {
+                document.getElementById('formatsGroup').innerHTML = 
+                    '<div style="color: var(--text-secondary); padding: 20px; text-align: center;">Запустите локальный сервер для загрузки форматов</div>';
                 return;
             }
 
@@ -745,30 +753,15 @@
             submitBtn.disabled = true;
 
             try {
-                // Пытаемся подключиться к локальному серверу
-                const response = await fetch('/generate', {
+                const response = await fetch('http://localhost:8000/generate', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    mode: 'cors',
-                    credentials: 'omit',
                     body: JSON.stringify({
                         input_text: inputText,
                         formats: formats,
                     }),
-                }).catch(() => {
-                    // Если не удалось, пробуем localhost
-                    return fetch('http://localhost:8000/generate', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            input_text: inputText,
-                            formats: formats,
-                        }),
-                    });
                 });
                     method: 'POST',
                     headers: {
