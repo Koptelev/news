@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление форматами - Генератор контента</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-black: #000000;
+            --color-white: #FFFFFF;
+            --color-gray-light: #F5F5F5;
+            --color-gray: #808080;
+            --color-gray-dark: #404040;
+            --color-beige: #F5F5DC;
+            --color-beige-dark: #E6E6D3;
+            --primary-gradient: linear-gradient(135deg, #000000 0%, #404040 100%);
+            --bg-gradient: linear-gradient(135deg, #F5F5F5 0%, #E6E6D3 100%);
+            --card-bg: #FFFFFF;
+            --text-primary: #000000;
+            --text-secondary: #808080;
+            --border-color: #E0E0E0;
+            --border-radius-md: 24px;
+            --border-radius-sm: 16px;
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-md);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: var(--color-black);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: var(--color-white);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+
+        .btn-secondary {
+            background: var(--color-beige);
+            color: var(--color-black);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-beige-dark);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+
+        .formats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .format-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-md);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            border: 2px solid var(--border-color);
+        }
+
+        .format-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--color-gray-dark);
+        }
+
+        .format-card h3 {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .format-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .badge-builtin {
+            background: var(--color-gray-light);
+            color: var(--color-black);
+        }
+
+        .badge-custom {
+            background: var(--color-beige);
+            color: var(--color-black);
+        }
+
+        .format-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .format-actions button {
+            flex: 1;
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .btn-edit {
+            background: var(--color-beige);
+            color: var(--color-black);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-edit:hover {
+            background: var(--color-beige-dark);
+        }
+
+        .btn-delete {
+            background: var(--color-gray-light);
+            color: var(--color-black);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-delete:hover {
+            background: var(--color-gray);
+            color: var(--color-white);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-md);
+            padding: 32px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h2 {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--color-black);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2em;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            font-family: inherit;
+            font-size: 1em;
+            transition: all 0.3s;
+            background: var(--color-white);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-black);
+            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--color-black);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+        }
+
+        .empty-state h2 {
+            font-size: 2em;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ Управление форматами</h1>
+            <div>
+                <a href="/" class="btn btn-secondary">← Назад</a>
+                <button class="btn btn-primary" onclick="openModal()">+ Новый формат</button>
+            </div>
+        </div>
+
+        <div id="formatsContainer" class="formats-grid">
+            <div class="loading">Загрузка форматов...</div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для редактирования/создания -->
+    <div id="formatModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Новый формат</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="formatForm">
+                <div class="form-group">
+                    <label for="formatName">Название формата:</label>
+                    <input type="text" id="formatName" name="format_name" required 
+                           placeholder="например: twitter, linkedin, blog">
+                </div>
+                <div class="form-group">
+                    <label for="systemPrompt">Системный промпт:</label>
+                    <textarea id="systemPrompt" name="system_prompt" required
+                              placeholder="Опишите роль AI и требования к формату..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="userPrompt">Пользовательский промпт:</label>
+                    <textarea id="userPrompt" name="user_prompt" required
+                              placeholder="Используйте {input_text} для вставки входного текста..."></textarea>
+                    <small style="color: var(--text-secondary); margin-top: 8px; display: block;">
+                        Используйте <code>{input_text}</code> для вставки входного текста
+                    </small>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let formats = {};
+        let editingFormat = null;
+
+        // Загрузка форматов
+        async function loadFormats() {
+            try {
+                const response = await fetch('/api/formats');
+                formats = await response.json();
+                renderFormats();
+            } catch (error) {
+                console.error('Ошибка загрузки форматов:', error);
+                document.getElementById('formatsContainer').innerHTML = 
+                    '<div class="empty-state"><h2>Ошибка загрузки</h2><p>Не удалось загрузить форматы</p></div>';
+            }
+        }
+
+        // Отображение форматов
+        function renderFormats() {
+            const container = document.getElementById('formatsContainer');
+            
+            if (Object.keys(formats).length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h2>Нет форматов</h2>
+                        <p>Создайте первый формат для генерации контента</p>
+                        <button class="btn btn-primary" onclick="openModal()">Создать формат</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = Object.entries(formats).map(([name, data]) => `
+                <div class="format-card">
+                    <h3>${escapeHtml(name)}</h3>
+                    <span class="format-badge ${data.is_builtin ? 'badge-builtin' : 'badge-custom'}">
+                        ${data.is_builtin ? '🔧 Встроенный' : '✨ Пользовательский'}
+                    </span>
+                    <p style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 16px;">
+                        ${escapeHtml(data.system.substring(0, 100))}...
+                    </p>
+                    <div class="format-actions">
+                        <button class="btn-edit" onclick="editFormat('${name}')">✏️ Редактировать</button>
+                        ${!data.is_builtin ? `<button class="btn-delete" onclick="deleteFormat('${name}')">🗑️ Удалить</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Открытие модального окна
+        function openModal(formatName = null) {
+            editingFormat = formatName;
+            const modal = document.getElementById('formatModal');
+            const form = document.getElementById('formatForm');
+            const title = document.getElementById('modalTitle');
+            
+            if (formatName) {
+                title.textContent = `Редактировать: ${formatName}`;
+                const format = formats[formatName];
+                document.getElementById('formatName').value = formatName;
+                document.getElementById('formatName').disabled = true;
+                document.getElementById('systemPrompt').value = format.system;
+                document.getElementById('userPrompt').value = format.user;
+            } else {
+                title.textContent = 'Новый формат';
+                form.reset();
+                document.getElementById('formatName').disabled = false;
+            }
+            
+            modal.classList.add('active');
+        }
+
+        // Закрытие модального окна
+        function closeModal() {
+            document.getElementById('formatModal').classList.remove('active');
+            editingFormat = null;
+            document.getElementById('formatForm').reset();
+            document.getElementById('formatName').disabled = false;
+        }
+
+        // Сохранение формата
+        document.getElementById('formatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                format_name: formData.get('format_name'),
+                system_prompt: formData.get('system_prompt'),
+                user_prompt: formData.get('user_prompt'),
+            };
+
+            try {
+                const response = await fetch('/api/formats', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Ошибка сохранения');
+                }
+
+                await loadFormats();
+                closeModal();
+                alert('Формат успешно сохранен!');
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
+        });
+
+        // Редактирование формата
+        function editFormat(formatName) {
+            openModal(formatName);
+        }
+
+        // Удаление формата
+        async function deleteFormat(formatName) {
+            if (!confirm(`Вы уверены, что хотите удалить формат "${formatName}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/formats/${formatName}`, {
+                    method: 'DELETE',
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Ошибка удаления');
+                }
+
+                await loadFormats();
+                alert('Формат успешно удален!');
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
+        }
+
+        // Закрытие модального окна по клику вне его
+        document.getElementById('formatModal').addEventListener('click', (e) => {
+            if (e.target.id === 'formatModal') {
+                closeModal();
+            }
+        });
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Загрузка при старте
+        loadFormats();
+    </script>
+</body>
+</html>
+
