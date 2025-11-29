@@ -28,8 +28,8 @@ Open-source сервис для автоматической генерации 
 
 1. Клонируйте репозиторий:
 ```bash
-git clone <repository-url>
-cd serv
+git clone https://github.com/Koptelev/news.git
+cd news
 ```
 
 2. Создайте виртуальное окружение:
