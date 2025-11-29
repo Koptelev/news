@@ -611,6 +611,7 @@
         // Загрузка форматов при старте
         async function loadFormats() {
             try {
+                // Используем относительный путь - работает когда страница открыта через FastAPI
                 const response = await fetch('/formats');
                 const data = await response.json();
                 const formatsGroup = document.getElementById('formatsGroup');
