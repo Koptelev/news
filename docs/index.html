@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор контента</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-black: #000000;
+            --color-white: #FFFFFF;
+            --color-gray-light: #F5F5F5;
+            --color-gray: #808080;
+            --color-gray-dark: #404040;
+            --color-beige: #F5F5DC;
+            --color-beige-dark: #E6E6D3;
+            --primary-gradient: linear-gradient(135deg, #000000 0%, #404040 100%);
+            --bg-gradient: linear-gradient(135deg, #F5F5F5 0%, #E6E6D3 100%);
+            --card-bg: #FFFFFF;
+            --text-primary: #000000;
+            --text-secondary: #808080;
+            --border-color: #E0E0E0;
+            --border-radius-sm: 16px;
+            --border-radius-md: 24px;
+            --border-radius-lg: 32px;
+            --border-radius-xl: 48px;
+            --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.15);
+            --shadow-xl: 0 30px 80px rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            min-height: 100vh;
+            padding: 24px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: float 20s infinite linear;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-50px, -50px) rotate(360deg); }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-xl);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: var(--primary-gradient);
+            color: var(--color-white);
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 2px, transparent 2px);
+            background-size: 60px 60px;
+            animation: rotate 30s infinite linear;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.8s ease-out;
+            color: var(--color-white);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.85;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+            animation: fadeIn 1s ease-out;
+            color: var(--color-beige);
+            line-height: 1.5;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content {
+            padding: 48px;
+        }
+
+        .form-group {
+            margin-bottom: 32px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.05em;
+            letter-spacing: -0.01em;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 180px;
+            padding: 20px 24px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            font-size: 1em;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--color-white);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--color-black);
+            background: var(--color-white);
+            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+
+        textarea::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .formats-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .format-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background: var(--color-beige);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: visible;
+        }
+
+        .format-checkbox::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--color-gray-dark);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+        }
+
+        .format-checkbox:hover {
+            border-color: var(--color-gray-dark);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            background: var(--color-beige-dark);
+        }
+
+        .format-checkbox:hover::before {
+            left: 0;
+            opacity: 0.05;
+        }
+
+        .format-checkbox input:checked + label {
+            color: var(--color-black);
+            font-weight: 700;
+        }
+
+        .format-checkbox input:checked ~ label::after {
+            content: ' ✓';
+            color: var(--color-black);
+            font-weight: 700;
+        }
+
+        .format-checkbox input {
+            margin-right: 16px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: var(--color-black);
+            position: relative;
+            z-index: 1;
+        }
+
+        .format-checkbox label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1em;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        button {
+            width: 100%;
+            padding: 22px;
+            background: var(--primary-gradient);
+            color: var(--color-white);
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: 1.15em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            letter-spacing: 0.01em;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:active {
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: var(--color-black);
+        }
+
+        .loading.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--color-gray-light);
+            border-top-color: var(--color-black);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .results {
+            display: none;
+            margin-top: 40px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .results h2 {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 32px;
+            color: var(--color-black);
+            letter-spacing: -0.02em;
+        }
+
+        .result-item {
+            margin-bottom: 28px;
+            padding: 32px;
+            background: var(--color-white);
+            border-radius: var(--border-radius-md);
+            border: 2px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: var(--color-black);
+            border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+        }
+
+        .result-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-gray-dark);
+        }
+
+        .result-item h3 {
+            color: var(--color-black);
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            text-transform: capitalize;
+        }
+
+        .result-content {
+            white-space: pre-wrap;
+            line-height: 1.8;
+            color: var(--text-primary);
+            background: var(--color-gray-light);
+            padding: 24px;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--border-color);
+            font-size: 1.05em;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .error {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.05) 0%, rgba(192, 57, 43, 0.05) 100%);
+            border-color: rgba(231, 76, 60, 0.2);
+        }
+
+        .error::before {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .error h3 {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .copy-btn {
+            margin-top: 16px;
+            padding: 12px 24px;
+            background: var(--color-black);
+            color: var(--color-white);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            background: var(--color-gray-dark);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .file-info {
+            margin-top: 24px;
+            padding: 16px 24px;
+            background: var(--color-beige);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            border: 1px solid var(--border-color);
+        }
+
+        .server-notice {
+            background: var(--color-beige);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: 24px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .server-notice h3 {
+            color: var(--color-black);
+            margin-bottom: 12px;
+            font-size: 1.2em;
+        }
+
+        .server-notice p {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .server-notice code {
+            background: var(--color-white);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: var(--color-black);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .content {
+                padding: 24px 16px;
+            }
+
+            .header {
+                padding: 32px 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .formats-group {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .format-checkbox {
+                padding: 16px 20px;
+            }
+
+            textarea {
+                min-height: 120px;
+                padding: 16px;
+                font-size: 0.95em;
+            }
+
+            button {
+                padding: 18px;
+                font-size: 1em;
+            }
+
+            .result-item {
+                padding: 20px;
+            }
+
+            .result-content {
+                padding: 16px;
+                font-size: 0.95em;
+            }
+
+            .container {
+                border-radius: var(--border-radius-md);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.75em;
+            }
+
+            .header p {
+                font-size: 0.9em;
+            }
+
+            .formats-group {
+                gap: 8px;
+            }
+
+            .format-checkbox {
+                padding: 12px 16px;
+            }
+
+            .format-checkbox label {
+                font-size: 0.95em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>Генератор контента</h1>
+                <p>Автоматическое создание контента в различных форматах с помощью искусственного интеллекта</p>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="server-notice" id="serverNotice">
+                <h3>⚠️ Требуется запущенный сервер</h3>
+                <p>Для работы сервиса необходимо запустить локальный сервер:</p>
+                <p><code>uvicorn src.main:app --reload</code></p>
+                <p>Затем откройте <code>http://localhost:8000</code></p>
+            </div>
+
+            <form id="generateForm">
+                <div class="form-group">
+                    <label for="inputText">Входной текст:</label>
+                    <textarea 
+                        id="inputText" 
+                        name="input_text" 
+                        placeholder="Введите текст новости или анонса для генерации контента в различных форматах..."
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Выберите форматы:</label>
+                    <div class="formats-group" id="formatsGroup">
+                        <div class="loading">Загрузка форматов...</div>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn">
+                    <span>Сгенерировать контент</span>
+                </button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Генерация контента... Пожалуйста, подождите</p>
+            </div>
+
+            <div class="results" id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('generateForm');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const submitBtn = document.getElementById('submitBtn');
+        const serverNotice = document.getElementById('serverNotice');
+
+        // Проверка доступности сервера
+        async function checkServer() {
+            try {
+                const response = await fetch('/formats', { 
+                    method: 'GET',
+                    mode: 'no-cors'
+                });
+                serverNotice.style.display = 'none';
+            } catch (error) {
+                // Сервер недоступен - показываем уведомление
+                console.log('Сервер недоступен, показываем инструкции');
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Загрузка форматов при старте
+        async function loadFormats() {
+            try {
+                const response = await fetch('/formats');
+                const data = await response.json();
+                const formatsGroup = document.getElementById('formatsGroup');
+                
+                const formatIcons = {
+                    'telegram': '📱',
+                    'email': '📧',
+                    'official_letter': '📄',
+                    'newsletter': '📬',
+                    'blog': '✍️',
+                    'press_release': '📰',
+                    'announcement': '📢',
+                    'ad_copy': '💼',
+                    'seo_article': '🔍',
+                    'video_script': '🎬',
+                    'podcast_description': '🎙️',
+                    'faq': '❓',
+                };
+
+                const formatNames = {
+                    'telegram': 'Telegram',
+                    'email': 'Email',
+                    'official_letter': 'Официальное письмо',
+                    'newsletter': 'Рассылка',
+                    'blog': 'Блог-статья',
+                    'press_release': 'Пресс-релиз',
+                    'announcement': 'Объявление',
+                    'ad_copy': 'Рекламный текст',
+                    'seo_article': 'SEO-статья',
+                    'video_script': 'Видео-скрипт',
+                    'podcast_description': 'Описание подкаста',
+                    'faq': 'FAQ',
+                };
+                
+                formatsGroup.innerHTML = data.available_formats.map(format => {
+                    const icon = formatIcons[format] || '📝';
+                    const name = formatNames[format] || format.charAt(0).toUpperCase() + format.slice(1).replace(/_/g, ' ');
+                    const isChecked = data.builtin_formats.includes(format) || ['telegram', 'email', 'blog', 'press_release'].includes(format);
+                    
+                    return `
+                        <div class="format-checkbox">
+                            <input type="checkbox" id="${format}" name="formats" value="${format}" ${isChecked ? 'checked' : ''}>
+                            <label for="${format}">${icon} ${name}</label>
+                        </div>
+                    `;
+                }).join('');
+
+                // Если форматы загрузились, скрываем уведомление
+                serverNotice.style.display = 'none';
+            } catch (error) {
+                console.error('Ошибка загрузки форматов:', error);
+                document.getElementById('formatsGroup').innerHTML = 
+                    '<div style="color: #e74c3c;">Ошибка загрузки форматов. Убедитесь, что сервер запущен.</div>';
+            }
+        }
+
+        // Загружаем форматы при загрузке страницы
+        loadFormats();
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const inputText = document.getElementById('inputText').value;
+            const formatCheckboxes = document.querySelectorAll('input[name="formats"]:checked');
+            const formats = Array.from(formatCheckboxes).map(cb => cb.value);
+
+            if (formats.length === 0) {
+                alert('Пожалуйста, выберите хотя бы один формат');
+                return;
+            }
+
+            // Показываем загрузку
+            loading.classList.add('active');
+            results.classList.remove('active');
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        input_text: inputText,
+                        formats: formats,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Ошибка: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+
+                // Плавная прокрутка к результатам
+                setTimeout(() => {
+                    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+
+                // Отображаем результаты
+                displayResults(data);
+
+            } catch (error) {
+                results.innerHTML = `
+                    <div class="result-item error">
+                        <h3>Ошибка</h3>
+                        <div class="result-content">${error.message}<br><br>Убедитесь, что сервер запущен на http://localhost:8000</div>
+                    </div>
+                `;
+                results.classList.add('active');
+            } finally {
+                loading.classList.remove('active');
+                submitBtn.disabled = false;
+            }
+        });
+
+        function displayResults(data) {
+            let html = '<h2>Результаты генерации</h2>';
+
+            for (const [format, content] of Object.entries(data.results)) {
+                if (content === null) {
+                    html += `
+                        <div class="result-item error">
+                            <h3>${format}</h3>
+                            <div class="result-content">Ошибка при генерации</div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="result-item">
+                            <h3>${format}</h3>
+                            <div class="result-content">${escapeHtml(content)}</div>
+                            <button class="copy-btn" onclick="copyToClipboard('${format}', \`${escapeForJs(content)}\`)">
+                                📋 Копировать
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+
+            if (data.output_file) {
+                html += `<div class="file-info">💾 Файл сохранен: ${data.output_file}</div>`;
+            }
+
+            results.innerHTML = html;
+            results.classList.add('active');
+        }
+
+        function escapeForJs(text) {
+            return text.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+        }
+
+        function copyToClipboard(format, content) {
+            navigator.clipboard.writeText(content).then(() => {
+                // Показываем уведомление вместо alert
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✓ Скопировано!';
+                btn.style.background = 'var(--color-gray-dark)';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Ошибка при копировании:', err);
+                alert('Не удалось скопировать в буфер обмена');
+            });
+        }
+    </script>
+</body>
+</html>
+
